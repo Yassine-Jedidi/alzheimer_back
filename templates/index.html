@@ -1,0 +1,100 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alzheimer Detection</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRmPCwLJ5BEP9yRkE8SM3I2zcpzXkxElMCg6kZg37"
+    crossorigin="anonymous"></script>
+</head>
+<body>
+    <h1>Alzheimer Detection</h1>
+    <h3>Detection by Sound</h3>
+    <button id="recordButton">Record</button>
+    <button id="stopButton" disabled>Stop</button> -->
+        <!-- <input type="file" id="audioFile" name="audioFile" accept="audio/*" style="display: none;">
+        <button type="submit">Submit</button> 
+    <br><br><br>
+    <label for="audio_file">Upload Audio File:</label>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    <h1 id="response"></h1>
+
+   
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alzheimer Detection</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Alzheimer Detection</h1>
+        <p>This application uses speech analysis to detect potential Alzheimer symptoms. Upload an audio file to begin the analysis.</p>
+            <div class="upload-section">
+                <input type="file" id="audioFile" name="file" accept="audio/*" class="file-input">
+                <label for="audioFile" class="file-label">Choose Audio File</label>
+                
+            </div>
+        <div class="progress-section" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <p class="progress-text">Analysis in progress: <span id="progressPercentage">0%</span></p>
+        </div>
+        
+        <form method="post">
+            <button id="analyzeButton" class="analyze-button" type="submit" disabled>Analyze Speech</button>
+        </form>
+    </div>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('audioFile');
+    const analyzeButton = document.getElementById('analyzeButton');
+    const progressSection = document.querySelector('.progress-section');
+    const progressBar = document.querySelector('.progress');
+    const progressPercentage = document.getElementById('progressPercentage');
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            analyzeButton.disabled = false;
+        } else {
+            analyzeButton.disabled = true;
+        }
+    });
+
+    analyzeButton.addEventListener('click', () => {
+        progressSection.style.display = 'block';
+        analyzeButton.disabled = true;
+        simulateAnalysis();
+    });
+
+    function simulateAnalysis() {
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 1;
+            progressBar.style.width = `${progress}%`;
+            progressPercentage.textContent = `${progress}%`;
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                analyzeButton.disabled = false;
+                alert('Analysis complete!');
+            }
+        }, 50);
+    }
+});
+    </script>
+</body>
+</html>
