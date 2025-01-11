@@ -35,10 +35,10 @@ def focal_loss(gamma=2., alpha=0.25):
     return loss
 
 
-def preprocess_audio(input_path, output_path="/home/bahe/Desktop/ci3/projet_federe/project/new_audio.wav"):
+def preprocess_audio(input_path, output_path="D:\\alzheimer\\new_audio.wav"):
     """
     Enhanced preprocessing pipeline for better diarization:
-    1. Load and convert to mono 16kHz
+    1. Load and convert to mono 16kHz (required by pyannote)
     2. Remove DC offset
     3. Apply pre-emphasis filter
     4. Apply bandpass filter focusing on speech frequencies (100-8000 Hz)
@@ -48,7 +48,7 @@ def preprocess_audio(input_path, output_path="/home/bahe/Desktop/ci3/projet_fede
     """
     print(f"\nPreprocessing {input_path}...")
 
-    # Load audio file and resample to 16kHz
+    # Load audio file and resample to 16kHz (required by pyannote)
     y, sr = librosa.load(input_path, sr=16000, mono=True)
     print(f"Loaded audio: {y.shape} samples, {sr}Hz")
 
@@ -56,7 +56,7 @@ def preprocess_audio(input_path, output_path="/home/bahe/Desktop/ci3/projet_fede
     y = librosa.util.normalize(y - np.mean(y))
     print("Removed DC offset")
 
-    # Apply pre-emphasis filter
+    # Apply pre-emphasis filter to enhance high frequencies
     pre_emphasis = 0.97
     y = np.append(y[0], y[1:] - pre_emphasis * y[:-1])
     print("Applied pre-emphasis filter")
@@ -64,7 +64,7 @@ def preprocess_audio(input_path, output_path="/home/bahe/Desktop/ci3/projet_fede
     # Bandpass filter
     nyquist = sr / 2
     low_freq = 100  # Hz
-    high_freq = min(8000, nyquist - 1)  # Hz
+    high_freq = min(8000, nyquist-1)  # Hz
     low = low_freq / nyquist
     high = high_freq / nyquist
     b, a = butter(4, [low, high], btype='band')
@@ -124,25 +124,13 @@ def predict_alzheimer(audio_path, model_path='alzheimer_model.h5',
     print("Model and preprocessing objects loaded successfully")
     print(f"Available labels: {labels}")
 
-    # Preprocess the new audio file
-    print("Preprocessing audio file...")
-    temp_output_path = "temp_processed_audio.wav"
-    processed_audio_path = preprocess_audio(audio_path)
+    # No need to preprocess audio again, as it has already been done
+    processed_audio_path = audio_path  # The already preprocessed audio file
 
     # Extract MFCC features
     print("Extracting MFCC features...")
     y, sr = librosa.load(processed_audio_path, sr=16000)
     mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
-
-    print(f"MFCC shape before interpolation: {mfccs.shape}")
-
-    # Flatten MFCCs before interpolation into a single row
-    flattened_mfccs_before = mfccs.flatten()
-    column_names_before = [f"mfcc_{frame + 1}_{coeff + 1}"
-                           for frame in range(mfccs.shape[1])
-                           for coeff in range(mfccs.shape[0])]
-    df_before_interpolation = pd.DataFrame(
-        [flattened_mfccs_before], columns=column_names_before)
 
     print(f"MFCC shape before interpolation: {mfccs.shape}")
 
@@ -205,5 +193,9 @@ def predict_alzheimer(audio_path, model_path='alzheimer_model.h5',
         confidence = prediction[0][0]
 
     predicted_label = labels[predicted_class]
+    print(f"Predicted class: {predicted_class} ({predicted_label})")
+
+    if predicted_label == "control":
+        confidence = 1 - confidence
 
     return df_before_interpolation, df_after_interpolation, predicted_label, confidence
